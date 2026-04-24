@@ -5,9 +5,9 @@ export default function GenerateInterviewPrompt(props) {
     Your task is to generate exactly ${process.env.NEXT_PUBLIC_INTERVIEW_QUESTION_COUNT} high-quality, role-specific interview questions along with concise, accurate answers.
 
     CONTEXT:
-    - Job Role: ${props.jobPosition}
-    - Job Description / Tech Stack: ${props.jobDesc}
-    - Candidate Experience: ${props.jobExperience} years
+    - Job Role: ${props.jobRole}
+    - Job Description / Tech Stack: ${props.jobDescription}
+    - Candidate Experience: ${props.experience} years
 
     INSTRUCTIONS:
     - Tailor questions based on the role, technologies, and experience level
@@ -36,4 +36,5 @@ export default function GenerateInterviewPrompt(props) {
     }
     ]
 `;
+return prompt;
 }

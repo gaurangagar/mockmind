@@ -12,15 +12,59 @@ import {
 import { Field, FieldGroup } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useState } from "react";
+import GenerateInterviewPrompt from "../../../../utils/prompts/GenerateInterviewPrompt";
 
 export default function AddInterview() {
+  const [loading, setLoading] = useState(false);
+  const [jobRole, setJobRole] = useState("");
+  const [jobDescription, setJobDescription] = useState("");
+  const [experience, setExperience] = useState("");
+  const [error, setError] = useState(false);
+
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    const prompt=GenerateInterviewPrompt({jobRole, jobDescription, experience})
+    // const prompt = GenerateInterviewPrompt({
+    //   jobRole: "Frontend Developer",
+    //   jobDescription: "React, Next.js, Tailwind CSS, REST APIs",
+    //   experience: "2",
+    // }); // testing purpose
+
+    try {
+      const response = await fetch("/api/groq", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          prompt,
+        }),
+      });
+
+      const data = await response.json(); // ✅ THIS IS THE KEY
+
+      console.log(data);
+      console.log(data.data); 
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+      setJobRole("");
+      setJobDescription("");
+      setExperience("");
+    }
+  };
+
   return (
     <Dialog>
-      <form>
         <DialogTrigger asChild>
-          <Button variant="outline">Open Dialog</Button>
+          <Button variant="outline">Add Interview</Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-sm">
+          <form onSubmit={onSubmit}>
           <DialogHeader>
             <DialogTitle>Describe Your Interview</DialogTitle>
             <DialogDescription>
@@ -34,6 +78,9 @@ export default function AddInterview() {
                 id="job-role"
                 name="jobRole"
                 placeholder="Fullstack Developer"
+                value={jobRole}
+                onChange={(e) => setJobRole(e.target.value)}
+                required
               />
             </Field>
 
@@ -43,6 +90,9 @@ export default function AddInterview() {
                 id="job-description"
                 name="jobDescription"
                 placeholder="React, NodeJS, MongoDB etc."
+                value={jobDescription}
+                onChange={(e) => setJobDescription(e.target.value)}
+                required
               />
             </Field>
 
@@ -53,6 +103,9 @@ export default function AddInterview() {
                 name="experience"
                 type="number"
                 placeholder="2"
+                value={experience}
+                onChange={(e) => setExperience(e.target.value)}
+                required
               />
             </Field>
           </FieldGroup>
@@ -62,8 +115,8 @@ export default function AddInterview() {
             </DialogClose>
             <Button type="submit">Generate your Interview</Button>
           </DialogFooter>
+          </form>
         </DialogContent>
-      </form>
     </Dialog>
   );
 }
