@@ -14,8 +14,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import GenerateInterviewPrompt from "../../../../utils/prompts/GenerateInterviewPrompt";
+import { useUser } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
 
 export default function AddInterview() {
+  const { user } = useUser();
+  const router = useRouter();
+
   const [loading, setLoading] = useState(false);
   const [jobRole, setJobRole] = useState("");
   const [jobDescription, setJobDescription] = useState("");
@@ -26,7 +31,11 @@ export default function AddInterview() {
     e.preventDefault();
     setLoading(true);
 
-    const prompt=GenerateInterviewPrompt({jobRole, jobDescription, experience})
+    const prompt = GenerateInterviewPrompt({
+      jobRole,
+      jobDescription,
+      experience,
+    });
     // const prompt = GenerateInterviewPrompt({
     //   jobRole: "Frontend Developer",
     //   jobDescription: "React, Next.js, Tailwind CSS, REST APIs",
@@ -47,7 +56,22 @@ export default function AddInterview() {
       const data = await response.json(); // ✅ THIS IS THE KEY
 
       console.log(data);
-      console.log(data.data); 
+      console.log(data.data);
+
+      const apiResponse = await fetch("/api/interview", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          jobRole,
+          jobDescription,
+          experience,
+          data: data.data,
+        }),
+      });
+      const mockId=apiResponse.mockId; 
+      router.push(`/dashboard/interview/${result.mockId}`);
     } catch (error) {
       console.log(error);
     } finally {
@@ -60,11 +84,11 @@ export default function AddInterview() {
 
   return (
     <Dialog>
-        <DialogTrigger asChild>
-          <Button variant="outline">Add Interview</Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-sm">
-          <form onSubmit={onSubmit}>
+      <DialogTrigger asChild>
+        <Button variant="outline">Add Interview</Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-sm">
+        <form onSubmit={onSubmit}>
           <DialogHeader>
             <DialogTitle>Describe Your Interview</DialogTitle>
             <DialogDescription>
@@ -115,8 +139,8 @@ export default function AddInterview() {
             </DialogClose>
             <Button type="submit">Generate your Interview</Button>
           </DialogFooter>
-          </form>
-        </DialogContent>
+        </form>
+      </DialogContent>
     </Dialog>
   );
 }
