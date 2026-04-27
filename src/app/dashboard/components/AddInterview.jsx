@@ -55,8 +55,8 @@ export default function AddInterview() {
 
       const data = await response.json(); // ✅ THIS IS THE KEY
 
-      console.log(data);
-      console.log(data.data);
+      // console.log(data);
+      // console.log(data.data);
 
       const apiResponse = await fetch("/api/interview", {
         method: "POST",
@@ -70,8 +70,10 @@ export default function AddInterview() {
           data: data.data,
         }),
       });
-      const mockId=apiResponse.mockId; 
-      router.push(`/dashboard/interview/${result.mockId}`);
+      const data1 = await apiResponse.json();
+      //console.log(data1.mockId);
+      const mockId=data1.mockId; 
+      router.push(`interview/${mockId}`);
     } catch (error) {
       console.log(error);
     } finally {

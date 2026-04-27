@@ -1,8 +1,18 @@
 import { getGroqChat } from "../../../../utils/Groq";
+import { currentUser } from "@clerk/nextjs/server";
 
 export async function POST(req) {
   try {
     const { prompt } = await req.json();
+
+    const user = await currentUser();
+
+    if (!user) {
+      return Response.json(
+        { success: false, error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
 
     const response = await getGroqChat(prompt); // ✅ await
 
